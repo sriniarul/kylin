@@ -16,7 +16,7 @@
 #
 
 # Docker image with Hadoop/Hive/HBase/Spark/ZK/Kafka/Livy installed
-FROM centos:6.9
+FROM ubuntu:18.04
 
 ENV HIVE_VERSION 1.2.1
 ENV HADOOP_VERSION 2.7.0
@@ -24,6 +24,7 @@ ENV HBASE_VERSION 1.1.2
 ENV SPARK_VERSION 2.3.1
 ENV KAFKA_VERSION 1.1.1
 ENV LIVY_VERSION 0.6.0
+ENV SQOOP_VERSION
 
 ENV JAVA_HOME /home/admin/jdk1.8.0_141
 ENV MVN_HOME /home/admin/apache-maven-3.6.1
@@ -36,8 +37,8 @@ ENV SPARK_HOME /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6
 ENV SPARK_CONF_DIR /home/admin/spark-$SPARK_VERSION-bin-hadoop2.6/conf
 ENV KAFKA_HOME /home/admin/kafka_2.11-$KAFKA_VERSION
 ENV LIVY_HOME /home/admin/apache-livy-$LIVY_VERSION-incubating-bin
-ENV PATH $PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$HIVE_HOME/bin:$HBASE_HOME/bin:$MVN_HOME/bin:spark-$SPARK_VERSION-bin-hadoop2.6/bin:$KAFKA_HOME/bin
-
+ENV SQOOP_HOME /home/admin/sqoop-$SQOOP_VERSION.bin__hadoop-2.6.0
+ENV PATH $PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$HIVE_HOME/bin:$HBASE_HOME/bin:$MVN_HOME/bin:spark-$SPARK_VERSION-bin-hadoop2.6/bin:$KAFKA_HOME/bin:$SQOOP_HOME/bin
 USER root
 
 WORKDIR /home/admin
@@ -102,3 +103,7 @@ RUN wget https://www.apache.org/dist/incubator/livy/$LIVY_VERSION-incubating/apa
     && unzip /home/admin/apache-livy-$LIVY_VERSION-incubating-bin.zip \
     && rm -f /home/admin/apache-livy-$LIVY_VERSION-incubating-bin.zip
 
+# setup sqoop
+RUN wget https://downloads.apache.org/sqoop/1.4.7/sqoop-1.4.7.bin__hadoop-2.6.0.tar.gz \
+    && tar -xvf /home/admin/sqoop-$SQOOP_VERSION.bin__hadoop-2.6.0.tar.gz \
+    && rm -f /home/admin/sqoop-$SQOOP_VERSION.bin__hadoop-2.6.0.tar.gz

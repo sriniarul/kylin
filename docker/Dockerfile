@@ -28,6 +28,11 @@ RUN wget https://archive.apache.org/dist/kylin/apache-kylin-$KYLIN_VERSION/apach
 
 RUN cp $HIVE_HOME/hcatalog/share/hcatalog/hive-hcatalog-core-1.2.1.jar $SPARK_HOME/jars/
 
+#setup postgresql JDBC
+RUN wget https://jdbc.postgresql.org/download/postgresql-42.2.18.jar \
+    && cp /home/admin/postgresql-42.2.18.jar $KYLIN_HOME/ext/ \
+    && mv /home/admin/postgresql-42.2.18.jar $SQOOP_HOME/lib
+
 RUN echo "kylin.engine.livy-conf.livy-enabled=true" >>  $KYLIN_HOME/conf/kylin.properties \
     && echo "kylin.engine.livy-conf.livy-url=http://127.0.0.1:8998" >>  $KYLIN_HOME/conf/kylin.properties \
     && echo kylin.engine.livy-conf.livy-key.file=hdfs://localhost:9000/kylin/livy/kylin-job-$KYLIN_VERSION.jar >> $KYLIN_HOME/conf/kylin.properties \
@@ -42,7 +47,15 @@ RUN echo "kylin.engine.livy-conf.livy-enabled=true" >>  $KYLIN_HOME/conf/kylin.p
     && echo kylin.engine.spark-conf.spark.executor.memoryOverhead=512M >> $KYLIN_HOME/conf/kylin.properties \
     && echo kylin.source.hive.redistribute-flat-table=false >> $KYLIN_HOME/conf/kylin.properties \
     && echo kylin.engine.spark-fact-distinct=true >> $KYLIN_HOME/conf/kylin.properties \
-    && echo kylin.engine.spark-udc-dictionary=true >> $KYLIN_HOME/conf/kylin.properties
+    && echo kylin.engine.spark-udc-dictionary=true >> $KYLIN_HOME/conf/kylin.properties \
+    && echo kylin.source.default=16 >> $KYLIN_HOME/conf/kylin.properties \
+    && echo kylin.source.jdbc.connection-url=jdbc:postgresql://docker.for.mac.host.internal:5432/live >> $KYLIN_HOME/conf/kylin.properties \
+    && echo kylin.source.jdbc.driver=org.postgresql.Driver >> $KYLIN_HOME/conf/kylin.properties \
+    && echo kylin.source.jdbc.dialect=postgresql >> $KYLIN_HOME/conf/kylin.properties \
+    && echo kylin.source.jdbc.user=arulsrinivaasan >> $KYLIN_HOME/conf/kylin.properties \
+    && echo kylin.source.jdbc.pass=postgres >> $KYLIN_HOME/conf/kylin.properties \
+    && echo kylin.source.jdbc.sqoop-home=$SQOOP_HOME >> $KYLIN_HOME/conf/kylin.properties \
+    && echo kylin.source.jdbc.filed-delimiter=| >> $KYLIN_HOME/conf/kylin.properties \
 
 COPY ./entrypoint.sh /home/admin/entrypoint.sh
 RUN chmod u+x /home/admin/entrypoint.sh
